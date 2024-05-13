@@ -313,3 +313,135 @@ class ModernTimes implements Movie
 ```
 
 Com isso nós conseguimos remover o método inutilizado na classe.
+
+## Dependency Inversion Principle (DIP)
+- Dependa de abstrações e não de implementações.
+    - Quando estamos falando em implementação nós estamos falando de uma **classe concreta**. Por outro lado uma abstração é um **modelo da classe** em si. Portanto quando se diz para depender em abstrações é para a gente não se prender especificamente a uma classe.
+- Inverter as dependências
+
+```php
+<?php
+class DramaCategory
+{
+
+}
+```
+
+```php
+<?php
+class Movie
+{
+    private $name;
+    private $category;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategoria(DramaCategory $category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+}
+```
+
+```php
+<?php
+class Movie
+{
+    private $name;
+    private $category;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategoria()
+    {
+        return new DramaCategory();
+    }
+}
+```
+Em ambas as classes que usam o **DramaCategory** temos um acoplamento muito forte entre as duas classes. E no final das contas é a classe **Movie** que usa a categoria.
+
+Para resolver esse problema de acoplamento nós podemos resolver da seguinte maneira:
+
+```php
+<?php
+interface Category
+{
+
+}
+```
+
+```php
+<?php
+class DramaCategory implements Category
+{
+
+}
+```
+
+```php
+<?php
+class Movie
+{
+    public function __construct($name, Category $category)
+    {
+        $this->name = $name;
+        $this->category = $category;
+    }
+    
+    private $name;
+    private $category;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategoria(Category $category)
+    {
+       $this->category = category;
+       return $this;
+    }
+}
+```
+
+Toda vez que damos **new nome objeto** dentro de uma classe existente, provavelmente estamos ferindo o princípio da Inversão de dependência. Mas sempre dependa da abstração e não da classe concreta.
